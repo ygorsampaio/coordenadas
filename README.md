@@ -1,0 +1,20 @@
+# Coordenadas
+
+Projeto de coordenadas com frontend e backend.
+
+## Estrutura
+
+- `frontend/`: Arquivos do frontend (HTML, CSS, JS)
+- `backend/`: API backend com Node.js e MongoDB
+
+## Como executar
+
+### Backend
+```bash
+cd backend
+npm install
+npm start
+```
+
+### Frontend
+Abra `frontend/index.html` no navegador ou use um servidor local.
