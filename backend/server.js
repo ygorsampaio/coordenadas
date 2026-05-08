@@ -17,6 +17,10 @@ app.get('/', (req, res) => {
   res.json({ status: 'ok', message: 'Localizador API v1.0' });
 });
 
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+});
+
 app.use('/api/locations', locationsRouter);
 
 // ── 404 handler ──────────────────────────────────────────────
@@ -31,15 +35,21 @@ app.use((err, req, res, next) => {
 });
 
 // ── MongoDB + Listen ─────────────────────────────────────────
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('✅ MongoDB conectado');
-    app.listen(PORT, () => {
-      console.log(`🚀 Servidor rodando na porta ${PORT}`);
+if (process.env.MONGODB_URI) {
+  mongoose
+    .connect(process.env.MONGODB_URI)
+    .then(() => {
+      console.log('✅ MongoDB conectado');
+    })
+    .catch((err) => {
+      console.error('⚠️  Erro ao conectar no MongoDB:', err.message);
+      console.log('⚠️  Servidor iniciará sem MongoDB. Algumas funcionalidades podem não estar disponíveis.');
     });
-  })
-  .catch((err) => {
-    console.error('❌ Erro ao conectar no MongoDB:', err.message);
-    process.exit(1);
-  });
+} else {
+  console.warn('⚠️  MONGODB_URI não configurado. Servidor rodará em modo offline.');
+}
+
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+  console.log(`📍 Acesse http://localhost:${PORT}`);
+});
