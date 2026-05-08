@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#060a12"/>
+  <!-- Pin drop shadow -->
+  <ellipse cx="256" cy="390" rx="44" ry="14" fill="rgba(251,191,36,0.25)"/>
+  <!-- Pin body -->
+  <path d="M256 100 C198 100 152 146 152 204 C152 272 256 390 256 390 C256 390 360 272 360 204 C360 146 314 100 256 100Z" fill="#fbbf24"/>
+  <!-- Pin inner circle -->
+  <circle cx="256" cy="204" r="38" fill="#060a12"/>
+  <!-- Pin inner dot -->
+  <circle cx="256" cy="204" r="16" fill="#fbbf24"/>
+  <!-- Coordinate lines -->
+  <line x1="256" y1="130" x2="256" y2="82" stroke="#34d399" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  <line x1="182" y1="204" x2="134" y2="204" stroke="#34d399" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  <line x1="330" y1="204" x2="378" y2="204" stroke="#34d399" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+</svg>
