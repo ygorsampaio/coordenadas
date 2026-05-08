@@ -31,7 +31,11 @@ app.use((err, req, res, next) => {
 
 if (process.env.MONGODB_URI) {
   mongoose
-    .connect(process.env.MONGODB_URI)
+    .connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      family: 4,
+    })
     .then(() => {
       console.log('✅ MongoDB conectado');
     })
