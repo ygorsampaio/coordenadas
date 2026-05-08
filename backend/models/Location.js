@@ -2,14 +2,12 @@ const mongoose = require('mongoose');
 
 const locationSchema = new mongoose.Schema(
   {
-    // Label definido pelo usuário (ex: "Casa", "Trabalho")
     label: {
       type: String,
       required: [true, 'O campo label é obrigatório'],
       trim: true,
       maxlength: [80, 'Label muito longo (máx. 80 caracteres)'],
     },
-    // Nome completo retornado pelo Nominatim
     display_name: {
       type: String,
       required: [true, 'O campo display_name é obrigatório'],
@@ -22,7 +20,6 @@ const locationSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Longitude é obrigatória'],
     },
-    // Anotações opcionais do usuário
     notes: {
       type: String,
       trim: true,
@@ -31,7 +28,7 @@ const locationSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // createdAt, updatedAt automáticos
+    timestamps: true,
   }
 );
 

@@ -1,50 +1,36 @@
 'use strict';
 
-/* ══════════════════════════════════════════════════════
-   LOCALIZADOR — script.js
-   ══════════════════════════════════════════════════════ */
-
-// ── Config ────────────────────────────────────────────
-// Troque para a URL do seu backend deployado
 const API_BASE = (() => {
   if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
     return 'http://localhost:3000/api';
   }
-  // Substitua pela sua URL de produção
-  // Exemplo: https://coordenadas-api.onrender.com/api
   return window.location.protocol + '//' + window.location.hostname + ':3000/api';
 })();
 
 const NOMINATIM = 'https://nominatim.openstreetmap.org';
 
-// ── State ─────────────────────────────────────────────
-let currentResult = null; // location found by search
-let editingId     = null; // id of location being edited
-let savedLocations = [];  // cached list
+let currentResult = null;
+let editingId = null;
+let savedLocations = [];
 
-// ── DOM refs ──────────────────────────────────────────
-const inputLocal     = document.getElementById('inputLocal');
-const btnBuscar      = document.getElementById('btnBuscar');
-const btnGeo         = document.getElementById('btnGeo');
-const resultado      = document.getElementById('resultado');
-const listaSalvos    = document.getElementById('listasSalvos');
-const salvosCount    = document.getElementById('salvosCount');
-const modalOverlay   = document.getElementById('modalOverlay');
-const modalLabel     = document.getElementById('modalLabel');
-const modalNotes     = document.getElementById('modalNotes');
+const inputLocal = document.getElementById('inputLocal');
+const btnBuscar = document.getElementById('btnBuscar');
+const btnGeo = document.getElementById('btnGeo');
+const resultado = document.getElementById('resultado');
+const listaSalvos = document.getElementById('listasSalvos');
+const salvosCount = document.getElementById('salvosCount');
+const modalOverlay = document.getElementById('modalOverlay');
+const modalLabel = document.getElementById('modalLabel');
+const modalNotes = document.getElementById('modalNotes');
 const btnModalCancel = document.getElementById('btnModalCancel');
-const btnModalSave   = document.getElementById('btnModalSave');
-const btnInstall     = document.getElementById('btnInstall');
+const btnModalSave = document.getElementById('btnModalSave');
+const btnInstall = document.getElementById('btnInstall');
 const toastContainer = document.getElementById('toastContainer');
 
-// ══════════════════════════════════════════════════════
-// TABS
-// ══════════════════════════════════════════════════════
 document.querySelectorAll('.nav-btn').forEach((btn) => {
   btn.addEventListener('click', () => {
     const panelId = btn.dataset.panel;
 
-    // Update buttons
     document.querySelectorAll('.nav-btn').forEach((b) => {
       b.classList.remove('active');
       b.setAttribute('aria-selected', 'false');
@@ -52,7 +38,6 @@ document.querySelectorAll('.nav-btn').forEach((btn) => {
     btn.classList.add('active');
     btn.setAttribute('aria-selected', 'true');
 
-    // Update panels
     document.querySelectorAll('.tab-panel').forEach((p) => {
       p.hidden = true;
       p.classList.remove('active');
@@ -61,21 +46,16 @@ document.querySelectorAll('.nav-btn').forEach((btn) => {
     panel.hidden = false;
     panel.classList.add('active');
 
-    // Load saved locations when switching to salvos
     if (panelId === 'salvos') loadSavedLocations();
   });
 });
 
-// Handle URL param ?tab=
 const urlTab = new URLSearchParams(location.search).get('tab');
 if (urlTab) {
   const tabBtn = document.querySelector(`[data-panel="${urlTab}"]`);
   if (tabBtn) tabBtn.click();
 }
 
-// ══════════════════════════════════════════════════════
-// SEARCH
-// ══════════════════════════════════════════════════════
 btnBuscar.addEventListener('click', () => doSearch(inputLocal.value.trim()));
 
 inputLocal.addEventListener('keydown', (e) => {
@@ -188,9 +168,6 @@ function renderResultCard(loc) {
   });
 }
 
-// ══════════════════════════════════════════════════════
-// GEOLOCATION (Hardware Feature — GPS)
-// ══════════════════════════════════════════════════════
 btnGeo.addEventListener('click', useGeolocation);
 
 function useGeolocation() {
@@ -207,7 +184,6 @@ function useGeolocation() {
     async (pos) => {
       const { latitude: lat, longitude: lon, accuracy } = pos.coords;
 
-      // Reverse geocoding: coords → place name
       try {
         const url = `${NOMINATIM}/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=pt-BR,pt`;
         const res  = await fetch(url, { headers: { 'User-Agent': 'Localizador-PWA/1.0' } });
@@ -216,7 +192,6 @@ function useGeolocation() {
         currentResult = { lat: String(lat), lon: String(lon), display_name: data.display_name || 'Localização atual' };
         renderResultCard(currentResult);
 
-        // Pre-fill save label
         const labelInput = document.getElementById('saveLabelInput');
         if (labelInput) {
           const city = data.address?.city || data.address?.town || data.address?.village || 'Minha Localização';
@@ -225,7 +200,6 @@ function useGeolocation() {
 
         showToast(`GPS preciso a ${Math.round(accuracy)}m`, 'success');
       } catch {
-        // Even if reverse geocoding fails, show coords
         currentResult = { lat: String(lat), lon: String(lon), display_name: 'Localização atual' };
         renderResultCard(currentResult);
         showToast('Localização obtida (sem nome disponível)', 'info');
@@ -252,9 +226,6 @@ function resetGeoBtn() {
   btnGeo.disabled = false;
 }
 
-// ══════════════════════════════════════════════════════
-// CRUD — CREATE
-// ══════════════════════════════════════════════════════
 async function saveLocation(label, loc) {
   const btn = document.getElementById('btnSaveLocation');
   if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
@@ -290,9 +261,6 @@ async function saveLocation(label, loc) {
   }
 }
 
-// ══════════════════════════════════════════════════════
-// CRUD — READ
-// ══════════════════════════════════════════════════════
 async function loadSavedLocations() {
   listaSalvos.innerHTML = `
     <div class="loading-state">
@@ -388,9 +356,6 @@ function renderSavedCard(loc) {
     </div>`;
 }
 
-// ══════════════════════════════════════════════════════
-// CRUD — UPDATE
-// ══════════════════════════════════════════════════════
 function openEditModal(loc) {
   editingId = loc._id;
   modalLabel.value = loc.label;
@@ -449,11 +414,7 @@ btnModalSave.addEventListener('click', async () => {
   }
 });
 
-// ══════════════════════════════════════════════════════
-// CRUD — DELETE
-// ══════════════════════════════════════════════════════
 async function deleteLocation(id, label) {
-  // Animate card out
   const card = document.getElementById(`card-${id}`);
   if (card) { card.style.opacity = '0.4'; card.style.pointerEvents = 'none'; }
 
@@ -471,14 +432,10 @@ async function deleteLocation(id, label) {
   }
 }
 
-// ══════════════════════════════════════════════════════
-// HELPERS
-// ══════════════════════════════════════════════════════
 function updateSalvosCount() {
   const count = savedLocations.length;
   salvosCount.textContent = count;
 
-  // Badge on nav
   let badge = document.querySelector('#tab-salvos .nav-badge');
   if (!badge) {
     const icon = document.querySelector('#tab-salvos .nav-btn-icon');
@@ -508,9 +465,6 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-// ══════════════════════════════════════════════════════
-// PWA — Service Worker + Install Prompt
-// ══════════════════════════════════════════════════════
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
@@ -520,7 +474,6 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// A2HS (Add to Home Screen) install prompt
 let deferredPrompt = null;
 
 window.addEventListener('beforeinstallprompt', (e) => {

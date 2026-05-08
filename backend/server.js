@@ -8,11 +8,9 @@ const locationsRouter = require('./routes/locations');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ── Middlewares ──────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
 
-// ── Routes ───────────────────────────────────────────────────
 app.get('/', (req, res) => {
   res.json({ status: 'ok', message: 'Localizador API v1.0' });
 });
@@ -23,18 +21,15 @@ app.get('/health', (req, res) => {
 
 app.use('/api/locations', locationsRouter);
 
-// ── 404 handler ──────────────────────────────────────────────
 app.use((req, res) => {
   res.status(404).json({ error: 'Rota não encontrada' });
 });
 
-// ── Error handler ─────────────────────────────────────────────
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Erro interno do servidor' });
 });
 
-// ── MongoDB + Listen ─────────────────────────────────────────
 if (process.env.MONGODB_URI) {
   mongoose
     .connect(process.env.MONGODB_URI)
