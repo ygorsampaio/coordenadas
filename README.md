@@ -1,4 +1,4 @@
-# Coordenadas
+﻿# Coordenadas
 
 Projeto de coordenadas com frontend e backend.
 
@@ -18,3 +18,4 @@ npm start
 
 ### Frontend
 Abra `frontend/index.html` no navegador ou use um servidor local.
+
