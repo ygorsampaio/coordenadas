@@ -1,4 +1,5 @@
 require('dotenv').config();
+const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -9,16 +10,18 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-
-app.get('/', (req, res) => {
-  res.json({ status: 'ok', message: 'Localizador API v1.0' });
-});
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 app.get('/health', (req, res) => {
   res.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
 
 app.use('/api/locations', locationsRouter);
+
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api/')) return next();
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Rota não encontrada' });

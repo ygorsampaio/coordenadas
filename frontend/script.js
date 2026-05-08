@@ -4,7 +4,7 @@ const API_BASE = (() => {
   if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
     return 'http://localhost:3000/api';
   }
-  return window.location.protocol + '//' + window.location.hostname + ':3000/api';
+  return `${window.location.origin}/api`;
 })();
 
 const NOMINATIM = 'https://nominatim.openstreetmap.org';
