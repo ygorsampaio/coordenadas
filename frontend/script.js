@@ -11,7 +11,8 @@ const API_BASE = (() => {
     return 'http://localhost:3000/api';
   }
   // Substitua pela sua URL de produção
-  return 'https://SEU-BACKEND.onrender.com/api';
+  // Exemplo: https://coordenadas-api.onrender.com/api
+  return window.location.protocol + '//' + window.location.hostname + ':3000/api';
 })();
 
 const NOMINATIM = 'https://nominatim.openstreetmap.org';
