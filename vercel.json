@@ -11,6 +11,8 @@
     { "src": "/icon.svg", "dest": "/frontend/icon.svg" },
     { "src": "/style.css", "dest": "/frontend/style.css" },
     { "src": "/script.js", "dest": "/frontend/script.js" },
+    { "src": "/index.html", "dest": "/frontend/index.html" },
+    { "src": "/", "dest": "/frontend/index.html" },
     { "src": "/(.*)", "dest": "/frontend/$1" }
   ]
 }
