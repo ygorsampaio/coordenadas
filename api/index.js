@@ -8,6 +8,9 @@ require('dotenv').config();
 const app = express();
 const MONGODB_URI = process.env.MONGODB_URI;
 
+console.log('📍 API iniciada');
+console.log('MONGODB_URI configurado:', !!MONGODB_URI);
+
 // Middlewares
 app.use(cors({
   origin: '*',
@@ -22,17 +25,31 @@ app.get('/health', (req, res) => {
   res.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
 
+// Root API info
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'ok',
+    message: 'Coordenadas API',
+    mongodbConnected: mongoose.connection.readyState === 1,
+    timestamp: new Date().toISOString()
+  });
+});
+
 // API Routes
-app.use('/locations', locationsRouter);
+app.use('/locations', (req, res, next) => {
+  console.log(`📍 ${req.method} /locations${req.path}`);
+  next();
+}, locationsRouter);
 
 // Fallback 404
 app.use((req, res) => {
-  res.status(404).json({ error: 'Rota não encontrada' });
+  console.log(`❌ 404 Not Found: ${req.method} ${req.path}`);
+  res.status(404).json({ error: 'Rota não encontrada', path: req.path });
 });
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('❌ Erro:', err.message);
   res.status(500).json({ error: 'Erro interno do servidor', message: err.message });
 });
 
@@ -44,8 +61,12 @@ if (MONGODB_URI) {
       socketTimeoutMS: 45000,
       family: 4,
     })
-    .then(() => console.log('✅ MongoDB conectado'))
-    .catch((err) => console.error('⚠️ Erro ao conectar no MongoDB:', err.message));
+    .then(() => {
+      console.log('✅ MongoDB conectado');
+    })
+    .catch((err) => {
+      console.error('⚠️ Erro ao conectar no MongoDB:', err.message);
+    });
 } else {
   console.warn('⚠️ MONGODB_URI não configurado. API rodará sem MongoDB.');
 }
