@@ -1,9 +1,10 @@
-﻿const express = require('express');
+﻿const path = require('path');
+const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const locationsRouter = require('../backend/routes/locations');
 
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 const app = express();
 const MONGODB_URI = process.env.MONGODB_URI;
