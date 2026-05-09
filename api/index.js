@@ -8,24 +8,35 @@ require('dotenv').config();
 const app = express();
 const MONGODB_URI = process.env.MONGODB_URI;
 
-app.use(cors());
-app.use(express.json());
+// Middlewares
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true
+}));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
+// Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
 
-app.use('/api/locations', locationsRouter);
+// API Routes
+app.use('/locations', locationsRouter);
 
+// Fallback 404
 app.use((req, res) => {
   res.status(404).json({ error: 'Rota não encontrada' });
 });
 
+// Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ error: 'Erro interno do servidor' });
+  res.status(500).json({ error: 'Erro interno do servidor', message: err.message });
 });
 
+// Connect to MongoDB
 if (MONGODB_URI) {
   mongoose
     .connect(MONGODB_URI, {
